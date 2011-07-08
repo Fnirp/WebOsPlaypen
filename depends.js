@@ -1,4 +1,4 @@
 enyo.depends(
-  "source/EventsList.js",
-  "css/EngagedBy.css"
+  "source/EventsListing.js",
+  "stylesheets/EngagedBy.css"
 );

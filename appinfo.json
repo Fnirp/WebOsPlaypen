@@ -1,9 +1,10 @@
 {
-  "id": "com.engagedby.events",
-  "version": "1.0.0",
-  "vendor": "Moving Flow",
-  "type": "web",
-  "main": "index.html",
-  "title": "Engaged By",
-  "uiRevision": "2"
+	"id": "com.movingflow.engagedby",
+	"version": "1.0.0",
+	"vendor": "Moving Flow",
+	"type": "web",
+	"main": "index.html",
+	"title": "Engaged By",
+	"icon": "icon.png",
+	"uiRevision": "2"
 }
