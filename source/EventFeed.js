@@ -30,7 +30,7 @@ enyo.kind({
 		this.data = [];
 		this.inherited(arguments);
 
-		this.$.header.setContent(localStorage.getItem("user_id"));
+		this.$.header.setContent("User id: " + localStorage.getItem("user_id"));
 		this.$.webService.call();
 	},
 
