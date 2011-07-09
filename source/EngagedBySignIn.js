@@ -1,16 +1,12 @@
 enyo.kind({
 	name: "EngagedBy.SignIn",
 	kind: enyo.VFlexBox,
+	className: "enyo-bg",
 	components: [
-	  
-	  {
-	      kind: "Header", content:"Welcome!",
-        style: "text-align: center"
-	  },
 	  {
         kind: "BasicWebView",
         name: "webView",
-        width: "500px",
+        width: "600px",
         style: "margin:auto",
         url: "http://engagedby.com/webos",
         onPageTitleChanged: "pageTitleChanged"
@@ -27,12 +23,4 @@ enyo.kind({
       this.owner.next(); // change view
     }
   }
-/*
-    //    
-    tar -cvf //the apps
-    copy into:
-    /media/internal/myfiles.tar
-    enable drive
-  }*/
-
 });
