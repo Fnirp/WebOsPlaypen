@@ -1,0 +1,31 @@
+{
+  "returnValue": true,
+  "schema": {
+    "name": "last, first",
+    "when": "date",
+    "color": "color",
+    "description": "sentence"
+  },
+  "results": 
+  [
+    {
+      "name": "HP Touchpad hacking event",
+      "when": "07/10/2011",
+      "color": "#b41a37",
+      "description": "Hoh, some listing about calendars perhaps?. "
+    },
+    {
+      "name": "Another event",
+      "when": "06/18/2011",
+      "color": "#54d386",
+      "description": "with some text in the description"
+    },
+    {
+      "name": "Enya music camp in Barcelona",
+      "when": "04/29/2011",
+      "color": "#db590a",
+      "description": "The awesomest music gig ever, come see us! "
+    }
+  ]
+}
+

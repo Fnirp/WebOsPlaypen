@@ -1,117 +1,157 @@
 enyo.kind({
 	name: "EventsList",
 	kind: enyo.VFlexBox,
+	published: {
+		selectedRecord: null
+	},
 	components: [
-		{kind: "WebService", url: "data/events.json", onSuccess: "queryResponse", onFailure: "queryFail"},
-		{kind: "Button", caption: "Load Data", onclick: "loadData"},
-		{flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "listSetupRow", components: [
-			{name: "itemCaption", onclick: "itemCaptionClick"},
-			{name: "itemDrawer", open: false, kind: "Drawer", onOpenAnimationComplete: "openAnimationComplete", components: [
-				{name: "itemVirtualRepeater", kind: "VirtualRepeater", onSetupRow: "repeaterSetupRow", components: [
-					{name: "repeaterItem", onclick: "repeaterItemClick"}
-				]}
+		{kind: "DbService", dbKind: "events", onFailure: "dbFail", components: [
+			{name: "dbFind", method: "find", subscribe: true, onSuccess: "queryResponse", onWatch: "queryWatch"},
+			{name: "dbDel", method: "del"},
+			{name: "dbPut", method: "put"},
+			{name: "dbMerge", method: "merge"}
+		]},
+		{kind: "MockDb", dbKind: "events", onSuccess: "queryResponse", onWatch: "queryWatch"},
+		{name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
+		{flex: 1, name: "list", kind: "DbList", pageSize: 50, onQuery: "listQuery", onSetupRow: "listSetupRow", components: [
+			{name: "item", kind: "SwipeableItem", className: "item", tapHighlight: false, confirmCaption: "Delete", onConfirm: "swipeDelete", onclick: "itemClick", components: [
+				{kind: "HFlexBox", components: [
+					{name: "itemColor", className: "item-color"},
+					{name: "itemName", flex: 1},
+					{name: "itemIndex", className: "item-index"}
+				]},
+				{name: "itemSubject", className: "item-subject"}
 			]}
 		]}
+/*		{kind: "HFlexBox", components: [
+			{flex: 1, kind: "Button", caption: "Create", onclick: "createItem"},
+			{flex: 1, kind: "Button", caption: "Update", onclick: "updateItem"},
+			{flex: 1, kind: "Button", caption: "Delete", onclick: "deleteItem"}
+		]},
+		{kind: "Button", caption: "Install Db", onclick: "installDb"},
+		{kind: "DbInstaller", onSuccess: "installSuccess", onFailure: "dbFail"}
+		*/
 	],
-	create: function() {
-		this.data = [];
-		this.inherited(arguments);
+	console: function(inMessage) {
+		this.$.console.setContent(inMessage);
 	},
-	loadData: function(inSender) {
-		this.$.webService.call();
+	dbFail: function(inSender, inResponse) {
+		this.console("dbService failure: " + enyo.json.stringify(inResponse));
 	},
-	queryResponse: function(inSender, inResponse) {
-		this.data = inResponse.results;
-/*		this.data.sort(function(inA, inB) {
-			// names are in "First Last" format, this code converts to "LastFirst" for comparison
-			var an = inA.name.split(" ");
-			an = an.pop() + an.pop();
-			var bn = inB.name.split(" ");
-			bn = bn.pop() + bn.pop();
-			if (an < bn) return -1;
-			if (an > bn) return 1;
-			return 0;
-		});*/
+	listQuery: function(inSender, inQuery) {
+		// IMPORTANT: must return a request object so dbList can decorate it
+		if (window.PalmSystem) {
+			inQuery.orderBy = "name";
+			return this.$.dbFind.call({query: inQuery});
+		} else {
+			return this.$.mockDb.call({query: inQuery}, {method: "find"});
+		}
+	},
+	queryResponse: function(inSender, inResponse, inRequest) {
+		this.$.list.queryResponse(inResponse, inRequest);
+	},
+	listSetupRow: function(inSender, inRecord, inIndex) {
+		//
+		// For records marked for deletion: 
+		//
+		// canGenerate = false prevents a control from rendering any HTML
+		this.$.item.canGenerate = !inRecord.deleted;
+		//
+		// we could use showing = false, which renders HTML with display: none, but it's slightly less efficient
+		//this.$.item.setShowing(!inRecord.deleted);
+		//
+		// or, we could render 'marked for deletion' rows with a decoration instead of hiding them
+		//this.$.item.applyStyle("background-color", inRecord.deleted ? "red" : null);
+		//
+		this.$.item.applyStyle("background-color", inRecord.selected ? "#F0F0FF" : null);
+		//
+		this.$.itemIndex.setContent("(" + inIndex + ")");
+		this.$.itemName.setContent(inRecord.name);
+		this.$.itemColor.applyStyle("background-color", inRecord.color);
+		this.$.itemSubject.setContent(inRecord.subject);
+	},
+	reset: function() {
+		this.$.list.reset();
+	},
+	queryWatch: function() {
+		this.console("dbService watch fired at " + new Date().toLocaleTimeString());
+		//
+		// NOTE: list.reset() can cause a visible flash on desktop browsers due to asynchrony between 
+		// rendering and data acquisition. We're working on a solution.
+		//
+		this.$.list.reset();
+	},
+	selectedRecordChanged: function(inOldRecord) {
+		if (inOldRecord) {
+			delete inOldRecord.selected;
+		}
+		if (this.selectedRecord) {
+			this.selectedRecord.selected = true;
+		}
 		this.$.list.refresh();
 	},
-	makeSubData: function() {
-		var r = [];
-		for (var j=0, t=10/*2+enyo.irand(3)*/; j < t; j++) {
-			r.push({number: enyo.irand(t)});
-		}
-		return r;
+	itemClick: function(inSender, inEvent) {
+		this.setSelectedRecord(this.$.list.fetch(inEvent.rowIndex));
 	},
-	listSetupRow: function(inSender, inIndex) {
-		var record = this.data[inIndex];
-		if (record) {
-			this.repeaterData = record;
-			this.$.itemCaption.setContent(record.name + " (" + inIndex + ")");
-			//this.$.itemDrawer.canGenerate = this.$.itemDrawer.open && Boolean(record.items && record.items.length);
-			return true;
-		}
-	},
-	repeaterSetupRow: function(inSender, inIndex) {
-		var d = this.repeaterData;
-		var record = d && d.items && d.items[inIndex];
-		if (record) {
-			this.$.repeaterItem.setContent(record.number);
-			return true;
-		}
-	},
-	lastOpen: null,
-	itemCaptionClick: function(inSender, inEvent) {
-		var r = inEvent.rowIndex;
-		// get row data
-		var d = this.data[r];
-		if (!(d && d.items)) {
-			this.fetchDataForRow(r, this.data[r]);
-		} else {
-			this.toggleDrawer(r);
-		}
-	},
-	// do asynchonous call for additional data
-	// note: normally would use a service call for this, just mocking the delay for now.
-	// note that private data like the rowIndex can be placed on the service request object.
-	fetchDataForRow: function(inRowIndex, inRowData) {
-		enyo.job("fetchDataForRow" + inRowIndex, enyo.bind(this, "gotDataForRow", inRowIndex, inRowData, this.makeSubData()), 100);
-	},
-	gotDataForRow: function(inRowIndex, inRowData, inSubData) {
-		inRowData.items = inSubData;
-		// populate the row's repeater with data
-		this.$.list.prepareRow(inRowIndex);
-		this.repeaterData = inRowData;
-		//
-		this.$.itemDrawer.render();
-		this.$.list.prepareRow(inRowIndex);
-		// toggle the drawer
-		this.toggleDrawer(inRowIndex);
-	},
-	// want only one drawer open at a time.
-	toggleDrawer: function(inRowIndex) {
-		this.animationCount = 1;
-		// toggle and remember state
-		this.$.itemDrawer.toggleOpen();
-		var o = this.$.itemDrawer.getOpen();
-		// close the last drawer
-		if (this.lastOpen != null && this.lastOpen != inRowIndex) {
-			if (this.$.list.prepareRow(this.lastOpen)) {
-				this.animationCount++;
+	createItem: function() {
+		if (this.selectedRecord) {
+			var record = enyo.clone(this.selectedRecord);
+			delete record._id;
+			delete record.selected;
+			record.name += ' (copy)';
+			record.subject = "Created at " + new Date().toLocaleTimeString();
+			if (window.PalmSystem) {
+				this.$.dbPut.call({objects: [record]});
+			} else {
+				this.$.mockDb.call({objects: [record]}, {method: "put"});
 			}
-			this.$.itemDrawer.setOpen(false);
 		}
-		// remember the last open drawer
-		this.lastOpen = o ? inRowIndex : null;
 	},
-	repeaterItemClick: function(inSender, inEvent) {
-		var i = this.$.list.fetchRowIndex();
-		var dataClicked = this.data[i].items[inEvent.rowIndex]
-		this.log(dataClicked);
-	},
-	openAnimationComplete: function(inSender) {
-		this.animationCount--;
-		if (!this.animationCount) {
-			this.$.list.refresh();
-			//this.log("refresh");
+	updateItem: function() {
+		if (this.selectedRecord) {
+			var record = this.selectedRecord;
+			record.subject = "Updated at " + new Date().toLocaleTimeString();
+			if (window.PalmSystem) {
+				this.$.dbMerge.call({objects: [{
+					_id: record._id,
+					subject: record.subject
+				}]});
+			} else {
+				this.$.mockDb.call({objects: [{
+					_id: record._id,
+					subject: record.subject
+				}]}, {method: "merge"});
+			}
 		}
+	},
+	deleteRecord: function(inRecord) {
+		if (inRecord) {
+			inRecord.deleted = true;
+			if (window.PalmSystem) {
+				this.$.dbDel.call({ids: [inRecord._id]});
+			} else {
+				this.$.mockDb.call({ids: [inRecord._id]}, {method: "del"});
+			}
+		}
+	},
+	deleteItem: function() {
+		this.deleteRecord(this.selectedRecord);
+	},
+	swipeDelete: function(inSender, inIndex) {
+		this.deleteRecord(this.$.list.fetch(inIndex));
+	},
+	//
+	// these methods are for installing the mock data into a database on a PalmSystem device
+	//
+	installDb: function() {
+		if (window.PalmSystem) {
+			this.$.dbInstaller.install(this.$.mockDb.dbKind, "events", this.$.mockDb.data);
+		} else {
+			console.log("Device required for install Db.");
+		}
+	},
+	installSuccess: function(inSender) {
+		this.$.list.punt();
+		this.console("install success");
 	}
 });
