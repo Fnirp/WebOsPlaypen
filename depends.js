@@ -1,6 +1,6 @@
 enyo.depends(
-  "source/MainPanels.js",
-  "source/EventsList.js",
+  "source/EventsListing.js",
+  "source/PanelOutline.js",
   "stylesheets/EngagedBy.css"
+  
 );
-
