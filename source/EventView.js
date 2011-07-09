@@ -11,7 +11,10 @@ enyo.kind({
 		{kind: enyo.Scroller, flex: 1, components: [
 			{kind: "WebView", name: "currentItemWebView", flex: 1, onLoadComplete: "hideWebViewSpinner", onLoadStarted: "showWebViewSpinner"}
 		]},
-		{kind: enyo.Toolbar, pack: "justify", components: [
+		{kind: enyo.Toolbar, /*pack: "justify",*/ components: [
+			{kind: enyo.GrabButton},
+			{flex: 1},
+			{icon: "images/CalendarMonth.png", onclick: "addToCalendar"/*, align: "right"*/},
 			{kind: enyo.GrabButton},
 			{flex: 1},
 			{icon: "images/Refresh.png", onclick: "refreshWebView", align: "right"}
