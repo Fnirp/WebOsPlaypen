@@ -3,13 +3,24 @@
  */
 enyo.kind({
 	name: "EngagedBy",
-	kind: enyo.VFlexBox,
+	kind: "Pane",
+	className: "layout",
 	components: [
-	  
-	  {kind: "SlidingPane", flex: 1, multiViewMinWidth: 480, onSelect: "paneSelected", name: "feedSlidingPane", components: [
-			{name: "EventFeedPane", width: "320px", kind: "EngagedBy.EventFeed", onListTap: "showFeed", onRefreshTap: "refreshTap"},
-			{name: "eventItemsPane", width: "320px", peekWidth: 50, kind: "EngagedBy.EventItems", onListTap: "openFeedItem", onRefreshTap: "refreshFeedItemsList"},
-			{name: "feedWebViewPane", flex: 1, peekWidth: 100, kind: "EngagedBy.EventView", onResize: "resizeWebView"}
-		]}
-	]
+	  {
+	    kind: "EngagedBy.SignIn",
+	    srcId: "view0"
+	  },
+	  {
+      kind: enyo.VFlexBox,
+      srcId: "view1",
+      components: [
+
+        {kind: "SlidingPane", flex: 1, multiViewMinWidth: 480, onSelect: "paneSelected", name: "feedSlidingPane", components: [
+          {name: "EventFeedPane", width: "320px", kind: "EngagedBy.EventFeed", onListTap: "showFeed", onRefreshTap: "refreshTap"},
+          {name: "eventItemsPane", width: "320px", peekWidth: 50, kind: "EngagedBy.EventItems", onListTap: "openFeedItem", onRefreshTap: "refreshFeedItemsList"},
+          {name: "feedWebViewPane", flex: 1, peekWidth: 100, kind: "EngagedBy.EventView", onResize: "resizeWebView"}
+        ]}
+      ]
+    }
+  ]
 });
