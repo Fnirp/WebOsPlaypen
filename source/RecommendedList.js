@@ -18,11 +18,13 @@ enyo.kind({
 		]}
 //		{name: "console", style: "color: white; background-color: gray; padding: 4px; border: 1px solid black"}
 	],
+	
 	create: function() {
 		this.data = [];
 		this.inherited(arguments);
 		this.$.webService.call();
 	},
+	
 	queryResponse: function(inSender, inResponse) {
 		this.data = inResponse.results;
 /*		this.data.sort(function(inA, inB) {
@@ -37,6 +39,7 @@ enyo.kind({
 		});*/
 		this.$.list.refresh();
 	},
+	
 	getGroupName: function(inIndex) {
 		// get previous record
 		var r0 = this.data[inIndex -1];
@@ -54,6 +57,7 @@ enyo.kind({
 		// new group if first letter of last name has changed
 		return a != b ? b : null;
 	},
+	
 	setupDivider: function(inIndex) {
 		// use group divider at group transition, otherwise use item border for divider
 		var group = this.getGroupName(inIndex);
@@ -61,11 +65,13 @@ enyo.kind({
 		this.$.divider.canGenerate = Boolean(group);
 		this.$.item.applyStyle("border-top", Boolean(group) ? "none" : "1px solid silver;");
 	},
+	
 	listSetupRow: function(inSender, inIndex) {
 		var record = this.data[inIndex];
 		if (record) {
 			// bind data to item controls
 			this.setupDivider(inIndex);
+			
 			this.$.itemIndex.setContent("(" + inIndex + ")");
 			this.$.itemName.setContent(record.name);
 			this.$.itemColor.applyStyle("background-color", record.color);

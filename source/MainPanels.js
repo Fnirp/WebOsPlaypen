@@ -14,7 +14,8 @@ enyo.kind({
           components: [   
           //Insert your components here
             {kind: "EventsList"}
-					  ]}
+					]
+				}
 			]},
 			{name: "middle", width: "320px", kind:"SlidingView", peekWidth: 50, components: [
 					{kind: "Header", content:"Recommended"},
