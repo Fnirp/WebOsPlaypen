@@ -4,7 +4,6 @@ enyo.kind({
 	kind: enyo.VFlexBox,
 	components: [
 		{kind: "WebService", url: "data/events.json", onSuccess: "queryResponse", onFailure: "queryFail"},
-		{kind: "Button", caption: "Load Data", onclick: "loadData"},
 		{flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "listSetupRow", components: [
 			{kind: "Divider"},
 			{kind: "Item", className: "item", components: [
@@ -13,7 +12,8 @@ enyo.kind({
 					{name: "itemName", flex: 1},
 					{name: "itemIndex", className: "item-index"}
 				]},
-				{name: "itemSubject", className: "item-subject"}
+				{name: "itemOrganisation", className: "item-organisation"},
+				{name: "itemDescription", className: "item-description"}
 			]}
 		]}
 //		{name: "console", style: "color: white; background-color: gray; padding: 4px; border: 1px solid black"}
@@ -21,8 +21,6 @@ enyo.kind({
 	create: function() {
 		this.data = [];
 		this.inherited(arguments);
-	},
-	loadData: function(inSender) {
 		this.$.webService.call();
 	},
 	queryResponse: function(inSender, inResponse) {
@@ -71,7 +69,12 @@ enyo.kind({
 			this.$.itemIndex.setContent("(" + inIndex + ")");
 			this.$.itemName.setContent(record.name);
 			this.$.itemColor.applyStyle("background-color", record.color);
-			this.$.itemSubject.setContent(record.subject);
+			this.$.itemOrganisation.applyStyle("font-size", "smaller");
+			this.$.itemOrganisation.applyStyle("font-weight", "bold");
+			this.$.itemOrganisation.setContent(record.organisation);
+			this.$.itemDescription.applyStyle("color", "grey");
+			this.$.itemDescription.applyStyle("font-size", "smaller");
+			this.$.itemDescription.setContent(record.description);
 			return true;
 		}
 	}
