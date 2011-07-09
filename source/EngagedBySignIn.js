@@ -17,11 +17,12 @@ enyo.kind({
 
   pageTitleChanged: function() {
     var url = this.$.webView.url;
+
     if(url.indexOf("user_id=") > 0) {
       var userId = url.split("user_id=")[1];
       enyo.setCookie("user_id", userId);
-      // change view
-      this.owner.next();
+      localStorage.setItem('user_id', userId);
+      this.owner.next(); // change view
     }
   }
 
