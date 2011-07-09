@@ -2,7 +2,6 @@ enyo.kind({
 	name: "EngagedBy.SignIn",
 	kind: enyo.VFlexBox,
 	components: [
-	  
 	  {
 	      kind: "Header", content:"Welcome!",
         style: "text-align: center"
@@ -24,11 +23,13 @@ enyo.kind({
       var userId = url.split("user_id=")[1];
       enyo.setCookie("user_id", userId);
       localStorage.setItem('user_id', userId);
+
       this.owner.next(); // change view
+      // this.$.webView.setUrl("https://www.linkedin.com/secure/login?session_full_logout=&trk=hb_signout");
     }
   }
 /*
-    //    
+    //
     tar -cvf //the apps
     copy into:
     /media/internal/myfiles.tar
