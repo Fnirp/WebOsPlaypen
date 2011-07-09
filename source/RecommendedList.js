@@ -1,17 +1,24 @@
 
 enyo.kind({
 	name: "RecommendedList",
-	kind: enyo.VFlexBox,
+	kind: enyo.VFlexBox,	
+	published: {
+		selectedRecord: null
+	},
 	components: [
 		{kind: "WebService", url: "data/events.json", onSuccess: "queryResponse", onFailure: "queryFail"},
+		{name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
+
+
 		{flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "listSetupRow", components: [
 			{kind: "Divider"},
-			{kind: "Item", className: "item", components: [
-				{kind: "HFlexBox", components: [
-					{name: "itemColor", className: "item-color"},
-					{name: "itemName", flex: 1},
-					{name: "itemIndex", className: "item-index"}
-				]},
+			  {kind: "Item", className: "item", onclick: "selectItem", Xonmousedown: "selectItem", components: [
+//    	{name: "item", kind: "SwipeableItem", className: "item", tapHighlight: false, confirmCaption: "Delete", onConfirm: "swipeDelete", onclick: "itemClick", components: [
+          {kind: "HFlexBox", components: [
+            {name: "itemColor", className: "item-color"},
+            {name: "itemName", flex: 1},
+            {name: "itemIndex", className: "item-index"}
+        ]},
 				{name: "itemOrganisation", className: "item-organisation"},
 				{name: "itemDescription", className: "item-description"}
 			]}
@@ -66,6 +73,7 @@ enyo.kind({
 		if (record) {
 			// bind data to item controls
 			this.setupDivider(inIndex);
+			this.$.item.applyStyle("background-color", inSender.isSelected(inIndex) ? "lightblue" : null);
 			this.$.itemIndex.setContent("(" + inIndex + ")");
 			this.$.itemName.setContent(record.name);
 			this.$.itemColor.applyStyle("background-color", record.color);
@@ -77,5 +85,8 @@ enyo.kind({
 			this.$.itemDescription.setContent(record.description);
 			return true;
 		}
+	},
+	selectItem: function(inSender, inEvent) {
+		this.$.list.select(inEvent.rowIndex);
 	}
 });
