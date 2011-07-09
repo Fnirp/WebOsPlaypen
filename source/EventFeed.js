@@ -8,79 +8,60 @@ enyo.kind({
 	},
 	components: [
 	  {kind: "Header", content:"Groups"},
-		{kind: "WebService", url: "data/events.json", onSuccess: "queryResponse", onFailure: "queryFail"},
-		//{kind: "Button", caption: "Load Data", onclick: "loadData"},
-
-		{flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "getFeed", components: [
-			{name: "itemCaption", onclick: "itemCaptionClick"},
-			{name: "itemDrawer", open: false, kind: "Drawer", onOpenAnimationComplete: "openAnimationComplete", components: [
-				{name: "itemVirtualRepeater", kind: "VirtualRepeater", onSetupRow: "repeaterSetupRow", components: [
-					{name: "repeaterItem", onclick: "repeaterItemClick"}
-				]}
-			]}
-		  ]},
+		{kind: "WebService", url: "http://engagedby.com/users/8.json", onSuccess: "queryResponse", onFailure: "queryFail"},
+    
+    {kind: enyo.Scroller, flex: 1, components: [
+      {kind: enyo.DividerDrawer, caption: "My Groups",components: [
+        {kind: enyo.VirtualRepeater, name: "myGroupsList", onSetupRow: "getGroup", onclick: "doListTap", components: [
+             {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, components: [
+               {name: "listItemTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: ""},
+               {name: "listItemSize", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"},
+             ]}
+           ]}
+      ]}
+    ]},
 		{kind: enyo.Toolbar, pack: "justify", components: [
 			{flex: 1},
 			{icon: "images/Refresh.png", onclick: "doRefreshTap", align: "right"}
 		]}		
 	],
 	
-	/*
-	------------
-	components:[
-		{kind: enyo.Header, style: "min-height: 60px;", components: [
-			{content: "Feeds"}
-		]},
-		{kind: enyo.Scroller, flex: 1, components: [
-			{kind: enyo.VirtualRepeater, name: "feedList", onSetupRow: "getFeed", onclick: "doListTap", components: [
-				{kind: enyo.SwipeableItem, onConfirm: "doDeleteFeed", layoutKind: enyo.HFlexLayout, tapHighlight: true, components: [
-					{name: "listItemTitle", content: ""}
-				]}
-			]}
-		]},
-		{kind: enyo.Toolbar, pack: "justify", components: [
-			{flex: 1},
-			{icon: "images/menu-icon-new.png", onclick: "doNewFeedTap", align: "right"}
-		]}
-
-	],
-	getFeed: function(inSender, inIndex) {
-		var r = this.owner.feedList[inIndex];
-		
-		if (r) {
-			this.$.listItemTitle.setContent(r.title);
-			return true;
-		}
-	}
-
-});-----------------------
-	*/
-	
 	create: function() {
 		this.data = [];
 		this.inherited(arguments);
 		this.$.webService.call();
 	},
-	getFeed: function(inSender, inIndex) {
-		var record = this.data[inIndex];
-		if (record) {
-			this.repeaterData = record;
-			this.$.itemCaption.setContent(record.name + " (" + inIndex + ")");
-			//this.$.itemDrawer.canGenerate = this.$.itemDrawer.open && Boolean(record.items && record.items.length);
-			return true;
-		}
+	
+	getGroup: function(inSender, inIndex) {
+	  if(this.data.length == 0) return false;
+		var group = this.data[inIndex];
+		
+    if (group) {
+      var groupId = group.entity.id;
+      var groupName = group.entity.name;
+      var groupEventsCount = group.entity.events_count;
+      var groupEventsImage = group.entity.profile_image_url;
+
+      this.$.listItemTitle.setContent(groupName);
+      this.$.listItemSize.setContent(groupEventsCount);
+      return true;
+    }
 	},
+	
 	queryResponse: function(inSender, inResponse) {
-		this.data = inResponse.results;
-		this.$.list.refresh();
+	  console.log("queryResponse!");
+    console.log(JSON.stringify(inResponse.user.groups));
+    console.log(JSON.stringify(inResponse.user.groups[0].entity));
+    console.log(inResponse.user.groups[0].entity.name);
+    
+    this.data = inResponse.user.groups;
+    this.$.myGroupsList.render();
 	},
-	makeSubData: function() {
-		var r = [];
-		for (var j=0, t=10/*2+enyo.irand(3)*/; j < t; j++) {
-			r.push({number: enyo.irand(t)});
-		}
-		return r;
+	
+	queryFail: function(inSender, inResponse) {
+	  
 	},
+	
 	repeaterSetupRow: function(inSender, inIndex) {
 		var d = this.repeaterData;
 		var record = d && d.items && d.items[inIndex];
@@ -89,7 +70,9 @@ enyo.kind({
 			return true;
 		}
 	},
+	
 	lastOpen: null,
+	
 	itemCaptionClick: function(inSender, inEvent) {
 		var r = inEvent.rowIndex;
 		// get row data
@@ -103,46 +86,46 @@ enyo.kind({
 	// do asynchonous call for additional data
 	// note: normally would use a service call for this, just mocking the delay for now.
 	// note that private data like the rowIndex can be placed on the service request object.
-	fetchDataForRow: function(inRowIndex, inRowData) {
-		enyo.job("fetchDataForRow" + inRowIndex, enyo.bind(this, "gotDataForRow", inRowIndex, inRowData, this.makeSubData()), 100);
-	},
-	gotDataForRow: function(inRowIndex, inRowData, inSubData) {
-		inRowData.items = inSubData;
-		// populate the row's repeater with data
-		this.$.list.prepareRow(inRowIndex);
-		this.repeaterData = inRowData;
-		//
-		this.$.itemDrawer.render();
-		this.$.list.prepareRow(inRowIndex);
-		// toggle the drawer
-		this.toggleDrawer(inRowIndex);
-	},
-	// want only one drawer open at a time.
-	toggleDrawer: function(inRowIndex) {
-		this.animationCount = 1;
-		// toggle and remember state
-		this.$.itemDrawer.toggleOpen();
-		var o = this.$.itemDrawer.getOpen();
-		// close the last drawer
-		if (this.lastOpen != null && this.lastOpen != inRowIndex) {
-			if (this.$.list.prepareRow(this.lastOpen)) {
-				this.animationCount++;
-			}
-			this.$.itemDrawer.setOpen(false);
-		}
-		// remember the last open drawer
-		this.lastOpen = o ? inRowIndex : null;
-	},
-	repeaterItemClick: function(inSender, inEvent) {
-		var i = this.$.list.fetchRowIndex();
-		var dataClicked = this.data[i].items[inEvent.rowIndex]
-		this.log(dataClicked);
-	},
-	openAnimationComplete: function(inSender) {
-		this.animationCount--;
-		if (!this.animationCount) {
-			this.$.list.refresh();
-			//this.log("refresh");
-		}
-	}
+  // fetchDataForRow: function(inRowIndex, inRowData) {
+  //  enyo.job("fetchDataForRow" + inRowIndex, enyo.bind(this, "gotDataForRow", inRowIndex, inRowData, this.makeSubData()), 100);
+  // },
+  // gotDataForRow: function(inRowIndex, inRowData, inSubData) {
+  //  inRowData.items = inSubData;
+  //  // populate the row's repeater with data
+  //  this.$.list.prepareRow(inRowIndex);
+  //  this.repeaterData = inRowData;
+  //  //
+  //  this.$.itemDrawer.render();
+  //  this.$.list.prepareRow(inRowIndex);
+  //  // toggle the drawer
+  //  this.toggleDrawer(inRowIndex);
+  // },
+  // // want only one drawer open at a time.
+  // toggleDrawer: function(inRowIndex) {
+  //  this.animationCount = 1;
+  //  // toggle and remember state
+  //  this.$.itemDrawer.toggleOpen();
+  //  var o = this.$.itemDrawer.getOpen();
+  //  // close the last drawer
+  //  if (this.lastOpen != null && this.lastOpen != inRowIndex) {
+  //    if (this.$.list.prepareRow(this.lastOpen)) {
+  //      this.animationCount++;
+  //    }
+  //    this.$.itemDrawer.setOpen(false);
+  //  }
+  //  // remember the last open drawer
+  //  this.lastOpen = o ? inRowIndex : null;
+  // },
+  // repeaterItemClick: function(inSender, inEvent) {
+  //  var i = this.$.list.fetchRowIndex();
+  //  var dataClicked = this.data[i].items[inEvent.rowIndex]
+  //  this.log(dataClicked);
+  // },
+  // openAnimationComplete: function(inSender) {
+  //  this.animationCount--;
+  //  if (!this.animationCount) {
+  //    this.$.list.refresh();
+  //    //this.log("refresh");
+  //  }
+  // }
 });
