@@ -1,4 +1,3 @@
-
 enyo.kind({
 	name: "EventsList",
 	kind: enyo.VFlexBox,
@@ -6,17 +5,13 @@ enyo.kind({
 		{kind: "WebService", url: "data/events.json", onSuccess: "queryResponse", onFailure: "queryFail"},
 		{kind: "Button", caption: "Load Data", onclick: "loadData"},
 		{flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "listSetupRow", components: [
-			{kind: "Divider"},
-			{kind: "Item", className: "item", components: [
-				{kind: "HFlexBox", components: [
-					{name: "itemColor", className: "item-color"},
-					{name: "itemName", flex: 1},
-					{name: "itemIndex", className: "item-index"}
-				]},
-				{name: "itemSubject", className: "item-subject"}
+			{name: "itemCaption", onclick: "itemCaptionClick"},
+			{name: "itemDrawer", open: false, kind: "Drawer", onOpenAnimationComplete: "openAnimationComplete", components: [
+				{name: "itemVirtualRepeater", kind: "VirtualRepeater", onSetupRow: "repeaterSetupRow", components: [
+					{name: "repeaterItem", onclick: "repeaterItemClick"}
+				]}
 			]}
 		]}
-//		{name: "console", style: "color: white; background-color: gray; padding: 4px; border: 1px solid black"}
 	],
 	create: function() {
 		this.data = [];
@@ -39,40 +34,84 @@ enyo.kind({
 		});*/
 		this.$.list.refresh();
 	},
-	getGroupName: function(inIndex) {
-		// get previous record
-		var r0 = this.data[inIndex -1];
-		// get (and memoized) first letter of last name
-		if (r0 && !r0.letter) {
-			r0.letter = r0.name.split(" ").pop()[0];
+	makeSubData: function() {
+		var r = [];
+		for (var j=0, t=10/*2+enyo.irand(3)*/; j < t; j++) {
+			r.push({number: enyo.irand(t)});
 		}
-		var a = r0 && r0.letter;
-		// get record
-		var r1 = this.data[inIndex];
-		if (!r1.letter) {
-			r1.letter = r1.name.split(" ").pop()[0];
-		}
-		var b = r1.letter;
-		// new group if first letter of last name has changed
-		return a != b ? b : null;
-	},
-	setupDivider: function(inIndex) {
-		// use group divider at group transition, otherwise use item border for divider
-		var group = this.getGroupName(inIndex);
-		this.$.divider.setCaption(group);
-		this.$.divider.canGenerate = Boolean(group);
-		this.$.item.applyStyle("border-top", Boolean(group) ? "none" : "1px solid silver;");
+		return r;
 	},
 	listSetupRow: function(inSender, inIndex) {
 		var record = this.data[inIndex];
 		if (record) {
-			// bind data to item controls
-			this.setupDivider(inIndex);
-			this.$.itemIndex.setContent("(" + inIndex + ")");
-			this.$.itemName.setContent(record.name);
-			this.$.itemColor.applyStyle("background-color", record.color);
-			this.$.itemSubject.setContent(record.subject);
+			this.repeaterData = record;
+			this.$.itemCaption.setContent(record.name + " (" + inIndex + ")");
+			//this.$.itemDrawer.canGenerate = this.$.itemDrawer.open && Boolean(record.items && record.items.length);
 			return true;
+		}
+	},
+	repeaterSetupRow: function(inSender, inIndex) {
+		var d = this.repeaterData;
+		var record = d && d.items && d.items[inIndex];
+		if (record) {
+			this.$.repeaterItem.setContent(record.number);
+			return true;
+		}
+	},
+	lastOpen: null,
+	itemCaptionClick: function(inSender, inEvent) {
+		var r = inEvent.rowIndex;
+		// get row data
+		var d = this.data[r];
+		if (!(d && d.items)) {
+			this.fetchDataForRow(r, this.data[r]);
+		} else {
+			this.toggleDrawer(r);
+		}
+	},
+	// do asynchonous call for additional data
+	// note: normally would use a service call for this, just mocking the delay for now.
+	// note that private data like the rowIndex can be placed on the service request object.
+	fetchDataForRow: function(inRowIndex, inRowData) {
+		enyo.job("fetchDataForRow" + inRowIndex, enyo.bind(this, "gotDataForRow", inRowIndex, inRowData, this.makeSubData()), 100);
+	},
+	gotDataForRow: function(inRowIndex, inRowData, inSubData) {
+		inRowData.items = inSubData;
+		// populate the row's repeater with data
+		this.$.list.prepareRow(inRowIndex);
+		this.repeaterData = inRowData;
+		//
+		this.$.itemDrawer.render();
+		this.$.list.prepareRow(inRowIndex);
+		// toggle the drawer
+		this.toggleDrawer(inRowIndex);
+	},
+	// want only one drawer open at a time.
+	toggleDrawer: function(inRowIndex) {
+		this.animationCount = 1;
+		// toggle and remember state
+		this.$.itemDrawer.toggleOpen();
+		var o = this.$.itemDrawer.getOpen();
+		// close the last drawer
+		if (this.lastOpen != null && this.lastOpen != inRowIndex) {
+			if (this.$.list.prepareRow(this.lastOpen)) {
+				this.animationCount++;
+			}
+			this.$.itemDrawer.setOpen(false);
+		}
+		// remember the last open drawer
+		this.lastOpen = o ? inRowIndex : null;
+	},
+	repeaterItemClick: function(inSender, inEvent) {
+		var i = this.$.list.fetchRowIndex();
+		var dataClicked = this.data[i].items[inEvent.rowIndex]
+		this.log(dataClicked);
+	},
+	openAnimationComplete: function(inSender) {
+		this.animationCount--;
+		if (!this.animationCount) {
+			this.$.list.refresh();
+			//this.log("refresh");
 		}
 	}
 });

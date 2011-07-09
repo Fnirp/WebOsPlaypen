@@ -20,6 +20,7 @@ enyo.kind({
 					{kind: "Header", content:"Recommended"},
 					{kind: "Scroller", flex: 1, components: [
 						//Insert your components here
+						{kind: "RecommendedList"}
 					]},
 					{kind: "Toolbar", components: [
 						{kind: "GrabButton"}
