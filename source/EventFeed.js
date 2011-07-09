@@ -1,35 +1,77 @@
 enyo.kind({
-	name: "EventsList",
-	kind: enyo.VFlexBox,
+	name: "EngagedBy.EventFeed",
+	kind: enyo.SlidingView,
+	layoutKind: enyo.VFlexLayout,
+	events: {
+		"onListTap": "",
+		"onRefreshTap": ""
+	},
 	components: [
+	  {kind: "Header", content:"Groups"},
 		{kind: "WebService", url: "data/events.json", onSuccess: "queryResponse", onFailure: "queryFail"},
 		//{kind: "Button", caption: "Load Data", onclick: "loadData"},
-		{flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "listSetupRow", components: [
+
+		{flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "getFeed", components: [
 			{name: "itemCaption", onclick: "itemCaptionClick"},
 			{name: "itemDrawer", open: false, kind: "Drawer", onOpenAnimationComplete: "openAnimationComplete", components: [
 				{name: "itemVirtualRepeater", kind: "VirtualRepeater", onSetupRow: "repeaterSetupRow", components: [
 					{name: "repeaterItem", onclick: "repeaterItemClick"}
 				]}
 			]}
-		]}
+		  ]},
+		{kind: enyo.Toolbar, pack: "justify", components: [
+			{flex: 1},
+			{icon: "images/Refresh.png", onclick: "doRefreshTap", align: "right"}
+		]}		
 	],
+	
+	/*
+	------------
+	components:[
+		{kind: enyo.Header, style: "min-height: 60px;", components: [
+			{content: "Feeds"}
+		]},
+		{kind: enyo.Scroller, flex: 1, components: [
+			{kind: enyo.VirtualRepeater, name: "feedList", onSetupRow: "getFeed", onclick: "doListTap", components: [
+				{kind: enyo.SwipeableItem, onConfirm: "doDeleteFeed", layoutKind: enyo.HFlexLayout, tapHighlight: true, components: [
+					{name: "listItemTitle", content: ""}
+				]}
+			]}
+		]},
+		{kind: enyo.Toolbar, pack: "justify", components: [
+			{flex: 1},
+			{icon: "images/menu-icon-new.png", onclick: "doNewFeedTap", align: "right"}
+		]}
+
+	],
+	getFeed: function(inSender, inIndex) {
+		var r = this.owner.feedList[inIndex];
+		
+		if (r) {
+			this.$.listItemTitle.setContent(r.title);
+			return true;
+		}
+	}
+
+});-----------------------
+	*/
+	
 	create: function() {
 		this.data = [];
 		this.inherited(arguments);
 		this.$.webService.call();
 	},
+	getFeed: function(inSender, inIndex) {
+		var record = this.data[inIndex];
+		if (record) {
+			this.repeaterData = record;
+			this.$.itemCaption.setContent(record.name + " (" + inIndex + ")");
+			//this.$.itemDrawer.canGenerate = this.$.itemDrawer.open && Boolean(record.items && record.items.length);
+			return true;
+		}
+	},
 	queryResponse: function(inSender, inResponse) {
 		this.data = inResponse.results;
-/*		this.data.sort(function(inA, inB) {
-			// names are in "First Last" format, this code converts to "LastFirst" for comparison
-			var an = inA.name.split(" ");
-			an = an.pop() + an.pop();
-			var bn = inB.name.split(" ");
-			bn = bn.pop() + bn.pop();
-			if (an < bn) return -1;
-			if (an > bn) return 1;
-			return 0;
-		});*/
 		this.$.list.refresh();
 	},
 	makeSubData: function() {
@@ -38,15 +80,6 @@ enyo.kind({
 			r.push({number: enyo.irand(t)});
 		}
 		return r;
-	},
-	listSetupRow: function(inSender, inIndex) {
-		var record = this.data[inIndex];
-		if (record) {
-			this.repeaterData = record;
-			this.$.itemCaption.setContent(record.name + " (" + inIndex + ")");
-			//this.$.itemDrawer.canGenerate = this.$.itemDrawer.open && Boolean(record.items && record.items.length);
-			return true;
-		}
 	},
 	repeaterSetupRow: function(inSender, inIndex) {
 		var d = this.repeaterData;

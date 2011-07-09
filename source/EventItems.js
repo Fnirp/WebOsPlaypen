@@ -1,13 +1,23 @@
 
 enyo.kind({
-	name: "RecommendedList",
-	kind: enyo.VFlexBox,	
+	name: "EngagedBy.EventItems",
+	kind: enyo.SlidingView,
+	layoutKind: enyo.VFlexLayout,
+	events: {
+		"onListTap": "",
+		"onRefreshTap": ""
+	},
 	published: {
 		selectedRecord: null
 	},
+/*	kind: enyo.VFlexBox,	
+	published: {
+		selectedRecord: null
+	},*/
 	components: [
+	  {kind: "Header", content:"Events"},
 		{kind: "WebService", url: "data/events.json", onSuccess: "queryResponse", onFailure: "queryFail"},
-		{name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
+//		{name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
 
 
 		{flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "listSetupRow", components: [
@@ -22,7 +32,13 @@ enyo.kind({
 				{name: "itemOrganisation", className: "item-organisation"},
 				{name: "itemDescription", className: "item-description"}
 			]}
+		]},
+		{kind: enyo.Toolbar, pack: "justify", components: [
+			{kind: enyo.GrabButton},
+			{flex: 1},
+			{icon: "images/Refresh.png", onclick: "doRefreshTap", align: "right"}
 		]}
+
 //		{name: "console", style: "color: white; background-color: gray; padding: 4px; border: 1px solid black"}
 	],
 	
