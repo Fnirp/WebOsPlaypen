@@ -12,7 +12,7 @@ enyo.kind({
       srcId: "Events",
       components: [
         {
-          kind: "SlidingPane", flex: 1, multiViewMinWidth: 480, onSelect: "paneSelected", name: "feedSlidingPane",
+          kind: "SlidingPane", flex: 1, multiViewMinWidth: 480, onSelect: "paneSelected", name: "feedSlidingPane", onResize: "resizeWebView",
           components: [
             {name: "eventFeedPane", width: "320px", kind: "EngagedBy.EventFeed", onListTap: "showFeed", onRefreshTap: "refreshTap"},
             {name: "eventItemsPane", width: "320px", peekWidth: 50, kind: "EngagedBy.EventItems", onListTap: "openFeedItem", onRefreshTap: "refreshFeedItemsList"},
@@ -45,4 +45,7 @@ enyo.kind({
   signOutOfLinkedIn: function(){
     this.$.feedWebViewPane.signOutOfLinkedIn();
   }
+  resizeWebView: function() {
+    this.$.feedWebViewPane.$.currentItemWebView.resize();
+  }  
 });

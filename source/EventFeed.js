@@ -20,7 +20,7 @@ enyo.kind({
               {kind: "VFlexBox", pack: "top", components: [
                 {name: "itemTitle", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"},
                 {name: "itemAmount", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
-              ]},
+              ]}
             ]}
           ]}
         ]}
@@ -32,14 +32,14 @@ enyo.kind({
               {name: "otherGroupItemIcon", kind: "Image", style: "width: 48px; height: 48px; border: 2px solid #ccc;", flex: 1},
               {kind: "VFlexBox", pack: "top", components: [
                 {name: "otherGroupItemTitle", style: "margin-left: 10px;", content: "1"},
-                {name: "placeHolder", style: "margin-left: 10px;", content: ""},
-              ]},
+                {name: "placeHolder", style: "margin-left: 10px;", content: ""}
+              ]}
             ]}
           ]}
         ]}
       ]}
     ]},
-    {name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
+//    {name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
 
     {kind: enyo.Toolbar, pack: "justify", components: [
       {flex: 1},
@@ -63,7 +63,7 @@ enyo.kind({
     this.$.myGroupsService.setUrl(url);
     this.$.myGroupsService.call();
   },
-  
+
   loadOtherGroupsPane: function(url) {
     console.log("loadOtherGroups: " + url);
     this.$.otherGroupsService.setUrl(url);
@@ -84,7 +84,7 @@ enyo.kind({
       var isRowSelected = (inIndex == this.selectedRow);
       // color the row if it is
       this.$.item.applyStyle("background", isRowSelected ? "lightblue" : null);
- 
+
       if(groupEventsImage != ""){
         this.$.itemIcon.show();
         this.$.itemIcon.setSrc(groupEventsImage);
@@ -97,7 +97,7 @@ enyo.kind({
       return true;
     }
   },
-  
+
   getOtherGroup: function(inSender, inIndex){
     if(!this.data['otherGroups']) { return false; }
     var otherGroup = this.data['otherGroups'][inIndex];
@@ -107,7 +107,7 @@ enyo.kind({
       var groupName = otherGroup.entity.name;
       var groupEventsCount = otherGroup.entity.events_count;
       var groupEventsImage = otherGroup.entity.profile_image_url;
-      
+
       // check if the row is selected
       var isRowSelected = (inIndex == this.selectedRow);
       // color the row if it is
@@ -126,20 +126,15 @@ enyo.kind({
 
   queryResponse: function(inSender, inResponse) {
     console.log("queryResponse!");
-    console.log(JSON.stringify(inResponse.user.groups));
-    console.log(JSON.stringify(inResponse.user.groups[0].entity));
     console.log(inResponse.user.groups[0].entity.name);
 
     this.data['myGroups'] = inResponse.user.groups;
     this.$.myGroupsList.render();
   },
-  
+
   otherGroupsResponse: function(inSender, inResponse) {
     console.log("otherGroupsResponse!");
-    console.log(JSON.stringify(inResponse.user.other_groups));
-    console.log(JSON.stringify(inResponse.user.other_groups[0].entity));
-    console.log(inResponse.user.other_groups[0].entity.name);
-  
+
     this.data['otherGroups'] = inResponse.user.other_groups.slice(0, 20);
     this.$.otherGroupsList.render();
   },
@@ -152,26 +147,26 @@ enyo.kind({
     this.selectedRow = -1;
     this.$.myGroupsList.render();
     this.$.otherGroupsList.render();
-    
+
     var group = this.data["myGroups"][inEvent.rowIndex];
-    
+
     this.selectedRow = inEvent.rowIndex;
     this.$.myGroupsList.render();
-    
+
     var url = group.entity.events_url;
     this.owner.loadEventItems(url);
   },
-  
+
   selectOtherGroupItem: function(inSender, inEvent) {
     this.selectedRow = -1;
     this.$.otherGroupsList.render();
     this.$.myGroupsList.render();
-    
+
     var group = this.data['otherGroups'][inEvent.rowIndex];
-    
+
     this.selectedRow = inEvent.rowIndex;
     this.$.otherGroupsList.render();
-    
+
     var url = group.entity.events_url;
     this.owner.loadEventItems(url);
   },
