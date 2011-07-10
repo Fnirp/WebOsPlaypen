@@ -39,6 +39,6 @@ enyo.kind({
   },
   
   loadEventView: function(url) {
-    this.$.eventItemsPane.loadEventViewPane(url);
-  }    
+    this.$.feedWebViewPane.loadEventViewPane(url);
+  }
 });

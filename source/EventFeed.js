@@ -53,6 +53,7 @@ enyo.kind({
 
   create: function() {
     this.data = {};
+    this.selectedRow = -1;
     this.inherited(arguments);
   },
 
@@ -73,12 +74,21 @@ enyo.kind({
     var group = this.data['myGroups'][inIndex];
 
     if (group) {
+      
+
       var groupId = group.entity.id;
       var groupName = group.entity.name;
       var groupEventsCount = group.entity.events_count;
       var groupEventsImage = group.entity.profile_image_url;
 
-      if(groupEventsImage !== ""){
+      // check if the row is selected
+      var isRowSelected = (inIndex == this.selectedRow);
+  //    this.selectedRow = - 1; //reset it so that if we change the group it's not defaulting
+
+      // color the row if it is
+      this.$.item.applyStyle("background", isRowSelected ? "lightblue" : null);
+ 
+      if(groupEventsImage != ""){
         this.$.itemIcon.show();
         this.$.itemIcon.setSrc(groupEventsImage);
       }else{
@@ -141,8 +151,11 @@ enyo.kind({
   selectItem: function(inSender, inEvent) {
     this.console("EventsFeed.selectItem is called !" + inEvent.rowIndex);
     var group = this.data["myGroups"][inEvent.rowIndex];
+    this.selectedRow = inEvent.rowIndex;
+    
     var url = group.entity.events_url;
-    this.console("eventsurl" + url);
+    
+    this.$.myGroupsList.render();
 
     this.owner.loadEventItems(url);
   },
