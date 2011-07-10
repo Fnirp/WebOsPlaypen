@@ -58,13 +58,13 @@ enyo.kind({
       var groupEventsCount = group.entity.events_count;
       var groupEventsImage = group.entity.profile_image_url;
 
-      if(groupEventsImage != ""){
+      if(groupEventsImage !== ""){
         this.$.itemIcon.show();
         this.$.itemIcon.setSrc(groupEventsImage);
       }else{
         this.$.itemIcon.hide();
       }
-        
+
       this.$.itemTitle.setContent(groupName);
       this.$.itemAmount.setContent(groupEventsCount + " event(s)");
       return true;
@@ -87,13 +87,10 @@ enyo.kind({
 
  selectItem: function(inSender, inEvent) {
     this.console("EventsFeed.selectItem is called !" + inEvent.rowIndex);
-//    this.$.item.select(inEvent.rowIndex);  //this doesn't work for whatever reason..
     var group = this.data[inEvent.rowIndex];
-//    this.console(JSON.stringify(this.data[inEvent.rowIndex]));
     var url = group.entity.events_url;
     this.console("eventsurl" + url);
-    
-//    this.console("after geturl ");
+
     this.owner.loadEventItems(url);
   }
 
