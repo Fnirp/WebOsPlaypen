@@ -152,7 +152,6 @@ enyo.kind({
     this.$.myGroupsList.render();
     this.$.otherGroupsList.render();
     
-    this.console("EventsFeed.selectItem is called !" + inEvent.rowIndex);
     var group = this.data["myGroups"][inEvent.rowIndex];
     
     this.selectedRow = inEvent.rowIndex;
@@ -167,14 +166,12 @@ enyo.kind({
     this.$.otherGroupsList.render();
     this.$.myGroupsList.render();
     
-    this.console("EventsFeed.selectOtherGroupItem is called !" + inEvent.rowIndex);
     var group = this.data['otherGroups'][inEvent.rowIndex];
     
     this.selectedRow = inEvent.rowIndex;
     this.$.otherGroupsList.render();
     
     var url = group.entity.events_url;
-    this.console("********OtherGroupItem eventsurl" + url);
     this.owner.loadEventItems(url);
   }
 
