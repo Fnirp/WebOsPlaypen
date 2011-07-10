@@ -13,7 +13,7 @@ enyo.kind({
       service: "palm://com.palm.applicationManager/",
       method: "open"
     },
-    {kind: "Header", style: "min-height: 60px;", components: [
+    {kind: "Header", components: [
       {kind: enyo.HFlexBox, flex: 1, components: [
         {content: "", name: "selectedItemName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
         {kind: enyo.Spinner, name: "itemWebViewSpinner", align: "right"}
@@ -25,7 +25,7 @@ enyo.kind({
     {kind: enyo.Toolbar, /*pack: "justify",*/ components: [
       {kind: enyo.GrabButton},
       {flex: 1},
-      {icon: "images/CalendarMonth.png", onclick: "addToCalendar"/*, align: "right"*/},
+      {icon: "images/calendar_month.png", onclick: "addToCalendar"/*, align: "right"*/},
       {kind: enyo.GrabButton},
       {flex: 1},
       {icon: "images/Refresh.png", onclick: "refreshWebView", align: "right"}
