@@ -54,7 +54,6 @@ enyo.kind({
   create: function() {
     this.data = {};
     this.selectedRow = -1;
-    this.selectedType = "";
     this.inherited(arguments);
   },
 
@@ -81,7 +80,7 @@ enyo.kind({
       var groupEventsImage = group.entity.profile_image_url;
 
       // check if the row is selected
-      var isRowSelected = (inIndex == this.selectedRow  && this.selectedType == "myGroupsList");
+      var isRowSelected = (inIndex == this.selectedRow);
       // color the row if it is
       this.$.item.applyStyle("background", isRowSelected ? "lightblue" : null);
  
@@ -109,7 +108,7 @@ enyo.kind({
       var groupEventsImage = otherGroup.entity.profile_image_url;
       
       // check if the row is selected
-      var isRowSelected = (inIndex == this.selectedRow && this.selectedType == "otherGroupsList");
+      var isRowSelected = (inIndex == this.selectedRow);
       // color the row if it is
       this.$.otherGroupsItem.applyStyle("background", isRowSelected ? "lightblue" : null);
 
@@ -149,30 +148,33 @@ enyo.kind({
   },
 
   selectItem: function(inSender, inEvent) {
+    this.selectedRow = -1;
+    this.$.myGroupsList.render();
+    this.$.otherGroupsList.render();
+    
     this.console("EventsFeed.selectItem is called !" + inEvent.rowIndex);
     var group = this.data["myGroups"][inEvent.rowIndex];
+    
     this.selectedRow = inEvent.rowIndex;
+    this.$.myGroupsList.render();
     
     var url = group.entity.events_url;
-    
-    this.selectedType="myGroupsList";
-    
-    this.$.myGroupsList.render();
-
     this.owner.loadEventItems(url);
   },
   
   selectOtherGroupItem: function(inSender, inEvent) {
+    this.selectedRow = -1;
+    this.$.otherGroupsList.render();
+    this.$.myGroupsList.render();
+    
     this.console("EventsFeed.selectOtherGroupItem is called !" + inEvent.rowIndex);
     var group = this.data['otherGroups'][inEvent.rowIndex];
+    
     this.selectedRow = inEvent.rowIndex;
+    this.$.otherGroupsList.render();
     
     var url = group.entity.events_url;
     this.console("********OtherGroupItem eventsurl" + url);
-    
-    this.selectedType="otherGroupsList";
-    this.$.otherGroupsList.render();
-    
     this.owner.loadEventItems(url);
   }
 
