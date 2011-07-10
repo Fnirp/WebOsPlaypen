@@ -14,8 +14,13 @@ enyo.kind({
       {kind: enyo.DividerDrawer, caption: "My Groups",components: [
         {kind: enyo.VirtualRepeater, name: "myGroupsList", onSetupRow: "getGroup", onclick: "selectItem", components: [
              {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, components: [
-               {name: "itemTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: ""},
-               {name: "itemAmount", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
+               {kind: "HFlexBox", pack: "top", components: [
+                 {name: "itemIcon", kind: "Image", style: "width: 48px; height: 48px", flex: 1},
+                 {kind: "VFlexBox", pack: "top", components: [
+                   {name: "itemTitle", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"},
+                   {name: "itemAmount", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
+                 ]},
+               ]}
              ]}
            ]}
       ]}
@@ -53,8 +58,15 @@ enyo.kind({
       var groupEventsCount = group.entity.events_count;
       var groupEventsImage = group.entity.profile_image_url;
 
+      if(groupEventsImage != ""){
+        this.$.itemIcon.show();
+        this.$.itemIcon.setSrc(groupEventsImage);
+      }else{
+        this.$.itemIcon.hide();
+      }
+        
       this.$.itemTitle.setContent(groupName);
-      this.$.itemAmount.setContent(groupEventsCount);
+      this.$.itemAmount.setContent(groupEventsCount + " event(s)");
       return true;
     }
   },
