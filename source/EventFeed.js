@@ -27,7 +27,7 @@ enyo.kind({
       ]},
       {kind: enyo.DividerDrawer, caption: "Popular Groups",components: [
         {kind: enyo.VirtualRepeater, name: "otherGroupsList", onSetupRow: "getOtherGroup", onclick: "selectOtherGroupItem", components: [
-          {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, components: [
+          {kind: enyo.Item, name: "otherGroupsItem", layout: enyo.HFlexBox, tapHighlight: true, components: [
             {kind: "HFlexBox", pack: "top", components: [
               {name: "otherGroupItemIcon", kind: "Image", style: "width: 48px; height: 48px; border: 2px solid #ccc;", flex: 1},
               {kind: "VFlexBox", pack: "top", components: [
@@ -54,6 +54,7 @@ enyo.kind({
   create: function() {
     this.data = {};
     this.selectedRow = -1;
+    this.selectedType = "";
     this.inherited(arguments);
   },
 
@@ -74,17 +75,13 @@ enyo.kind({
     var group = this.data['myGroups'][inIndex];
 
     if (group) {
-      
-
       var groupId = group.entity.id;
       var groupName = group.entity.name;
       var groupEventsCount = group.entity.events_count;
       var groupEventsImage = group.entity.profile_image_url;
 
       // check if the row is selected
-      var isRowSelected = (inIndex == this.selectedRow);
-  //    this.selectedRow = - 1; //reset it so that if we change the group it's not defaulting
-
+      var isRowSelected = (inIndex == this.selectedRow  && this.selectedType == "myGroupsList");
       // color the row if it is
       this.$.item.applyStyle("background", isRowSelected ? "lightblue" : null);
  
@@ -110,6 +107,11 @@ enyo.kind({
       var groupName = otherGroup.entity.name;
       var groupEventsCount = otherGroup.entity.events_count;
       var groupEventsImage = otherGroup.entity.profile_image_url;
+      
+      // check if the row is selected
+      var isRowSelected = (inIndex == this.selectedRow && this.selectedType == "otherGroupsList");
+      // color the row if it is
+      this.$.otherGroupsItem.applyStyle("background", isRowSelected ? "lightblue" : null);
 
       if(groupEventsImage !== ""){
         this.$.otherGroupItemIcon.setSrc(groupEventsImage);
@@ -121,8 +123,6 @@ enyo.kind({
       return true;
     }
   },
-
-  
 
   queryResponse: function(inSender, inResponse) {
     console.log("queryResponse!");
@@ -155,6 +155,8 @@ enyo.kind({
     
     var url = group.entity.events_url;
     
+    this.selectedType="myGroupsList";
+    
     this.$.myGroupsList.render();
 
     this.owner.loadEventItems(url);
@@ -163,9 +165,14 @@ enyo.kind({
   selectOtherGroupItem: function(inSender, inEvent) {
     this.console("EventsFeed.selectOtherGroupItem is called !" + inEvent.rowIndex);
     var group = this.data['otherGroups'][inEvent.rowIndex];
+    this.selectedRow = inEvent.rowIndex;
+    
     var url = group.entity.events_url;
     this.console("********OtherGroupItem eventsurl" + url);
-
+    
+    this.selectedType="otherGroupsList";
+    this.$.otherGroupsList.render();
+    
     this.owner.loadEventItems(url);
   }
 
