@@ -30,7 +30,7 @@ enyo.kind({
   loadEventItems: function(url) {
     this.$.eventItemsPane.loadEventItemsPane(url);
   },
-  loadEventView: function(url) {
-    this.$.feedWebViewPane.loadEventViewPane(url);
+  loadEventView: function(url, event) {
+    this.$.feedWebViewPane.loadEventViewPane(url, event);
   }
 });

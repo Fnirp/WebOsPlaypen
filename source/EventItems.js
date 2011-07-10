@@ -77,7 +77,11 @@ enyo.kind({
       this.$.itemOrganisation.setContent(item.event.entity.name);
       this.$.itemDescription.applyStyle("color", "grey");
       this.$.itemDescription.applyStyle("font-size", "smaller");
-      this.$.itemDescription.setContent(item.event.start_date_formatted);
+      if(item.event.location_text) {
+        this.$.itemDescription.setContent(item.event.start_date_formatted + " - " + item.event.location_text);
+      } else {
+        this.$.itemDescription.setContent(item.event.start_date_formatted);
+      }
       return true;
     }
   },
@@ -105,7 +109,7 @@ enyo.kind({
 
     var item = this.data[inEvent.rowIndex];
     var url = item.event.webpage_url;
-    this.owner.loadEventView(url);
+    this.owner.loadEventView(url, item.event);
     this.$.myItemList.render();
   }
 

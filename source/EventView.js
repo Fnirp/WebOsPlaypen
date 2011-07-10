@@ -32,8 +32,9 @@ enyo.kind({
     ]}
   ],
 
-  loadEventViewPane: function(url) {
+  loadEventViewPane: function(url, event) {
     this.$.currentItemWebView.setUrl(url);
+    this.event = event;
   },
 
   hideWebViewSpinner: function() {
@@ -53,25 +54,27 @@ enyo.kind({
 
 
   eventParams: function() {
+    var date = new Date(this.event.start_date).valueOf();
+    var start_date = date + "";
     params = {
       newEvent: {
-        subject: 'Take daily medicine',  // string
-        dtstart: '1290711600000', // string representing the start date/time as timestamp in milliseconds
-        dtend: '1290718800000',  // string representing the end date/time as timestamp in milliseconds
-        location: 'Wherever I am!', // string
-        rrule: {
-          freq: "DAILY",
-          count: 3
-        },  // rrule object -- see Calendar schema for details
-        tzId: "America/Los_Angeles", // string representing a standard Olson timezone name
-        alarm: [{
-          alarmTrigger: {
-              valueType: "DURATION",
-              value: "-PT15M"
-          }
-        }], // array of alarm objects -- see Calendar schema for details
-        note: 'Take alergy medicine, 1 pill, or 2 if you feel like it.',  // string
-        allDay: false  // boolean
+        subject: this.event.name + " - " + this.event.entity.name,  // string
+        dtstart: start_date,  // string representing the start date/time as timestamp in milliseconds
+        // dtend: '1290718800000',    // string representing the end date/time as timestamp in milliseconds
+        location: this.event.location_text ? this.event.location_text : "", // string
+        // rrule: {
+          // freq: "DAILY",
+          // count: 3
+        // },  // rrule object -- see Calendar schema for details
+        tzId: "Europe/London", // string representing a standard Olson timezone name
+        // alarm: [{
+          // alarmTrigger: {
+              // valueType: "DURATION",
+              // value: "-PT15M"
+          // }
+        // }], // array of alarm objects -- see Calendar schema for details
+        note: this.event.webpage_url,  // string
+        allDay: true  // boolean
       }
     };
     return params;
