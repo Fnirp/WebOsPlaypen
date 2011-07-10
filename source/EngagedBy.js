@@ -27,9 +27,16 @@ enyo.kind({
     console.log("2 user_id: " + url);
     this.$.eventFeedPane.loadGroupsPane(url);
   },
+  
+  // loadOtherGroups: function(url) {
+  //   console.log("2 user_id: " + url);
+  //   this.$.eventFeedPane.loadGroupsPane(url);
+  // },
+  
   loadEventItems: function(url) {
     this.$.eventItemsPane.loadEventItemsPane(url);
-  },    
+  },
+  
   loadEventView: function(url) {
     this.$.eventItemsPane.loadEventViewPane(url);
   }    

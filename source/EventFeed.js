@@ -8,22 +8,24 @@ enyo.kind({
   },
   components: [
     {kind: "Header", name: "header", content: "Groups"},
-    {kind: "WebService", onSuccess: "queryResponse", onFailure: "queryFail"},
+    {kind: "WebService", name: "myGroupsService", onSuccess: "queryResponse", onFailure: "queryFail"},
+    // {kind: "WebService", name: "otherGroupsService", onSuccess: "otherGroupsResponse", onFailure: "otherGroupsFail"},
 
     {kind: enyo.Scroller, flex: 1, components: [
       {kind: enyo.DividerDrawer, caption: "My Groups",components: [
         {kind: enyo.VirtualRepeater, name: "myGroupsList", onSetupRow: "getGroup", onclick: "selectItem", components: [
-             {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, components: [
-               {kind: "HFlexBox", pack: "top", components: [
-                 {name: "itemIcon", kind: "Image", style: "width: 48px; height: 48px; border: 2px solid #ccc;", flex: 1},
-                 {kind: "VFlexBox", pack: "top", components: [
-                   {name: "itemTitle", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"},
-                   {name: "itemAmount", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
-                 ]},
-               ]}
-             ]}
-           ]}
-      ]}
+          {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, components: [
+            {kind: "HFlexBox", pack: "top", components: [
+              {name: "itemIcon", kind: "Image", style: "width: 48px; height: 48px; border: 2px solid #ccc;", flex: 1},
+              {kind: "VFlexBox", pack: "top", components: [
+                {name: "itemTitle", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"},
+                {name: "itemAmount", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
+              ]},
+            ]}
+          ]}
+        ]}
+      ]},
+      {kind: enyo.DividerDrawer, caption: "Other Groups",components: []}
     ]},
     {name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
 
@@ -38,19 +40,19 @@ enyo.kind({
   },
 
   create: function() {
-    this.data = [];
+    this.data = {};
     this.inherited(arguments);
   },
 
   loadGroupsPane: function(url) {
     console.log("3 user_id: " + url);
-    this.$.webService.setUrl(url);
-    this.$.webService.call();
+    this.$.myGroupsService.setUrl(url);
+    this.$.myGroupsService.call();
   },
 
   getGroup: function(inSender, inIndex) {
-    if(this.data.length === 0) { return false; }
-    var group = this.data[inIndex];
+    if(!this.data['myGroups']) { return false; }
+    var group = this.data['myGroups'][inIndex];
 
     if (group) {
       var groupId = group.entity.id;
@@ -77,9 +79,19 @@ enyo.kind({
     console.log(JSON.stringify(inResponse.user.groups[0].entity));
     console.log(inResponse.user.groups[0].entity.name);
 
-    this.data = inResponse.user.groups;
+    this.data['myGroups'] = inResponse.user.groups;
     this.$.myGroupsList.render();
   },
+  
+  // otherGroupsResponse: function(inSender, inResponse) {
+  //   console.log("otherGroupsResponse!");
+  //   console.log(JSON.stringify(inResponse.groups));
+  //   console.log(JSON.stringify(inResponse.groups[0].entity));
+  //   console.log(inResponse.groups[0].entity.name);
+  // 
+  //   this.data = inResponse.groups;
+  //   this.$.myGroupsList.render();
+  // },
 
   queryFail: function(inSender, inResponse) {
     console.log("queryFail!");
