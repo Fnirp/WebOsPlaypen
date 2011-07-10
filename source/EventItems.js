@@ -16,7 +16,7 @@ enyo.kind({
     //{kind: "WebService", url: "http://engagedby.com/users/9.json", onSuccess: "queryResponse", onFailure: "queryFail"},
 
     {kind: enyo.Scroller, flex: 1, components: [
-      {kind: enyo.DividerDrawer, caption: "Time",components: [
+      {kind: enyo.DividerDrawer, caption: "Upcoming",components: [
         {kind: enyo.VirtualRepeater, name: "myItemList", onSetupRow: "getEvents", components: [
             {kind: enyo.Item, name: "item", layout: enyo.HFlexBox, tapHighlight: true, onclick: "selectItem", components: [
                  {kind: "HFlexBox", components: [
@@ -30,7 +30,7 @@ enyo.kind({
       ]}
     ]},
 
-    {name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
+//    {name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
 
     {kind: enyo.Toolbar, pack: "justify", components: [
       {kind: enyo.GrabButton},
