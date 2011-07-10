@@ -5,6 +5,6 @@
 	"type": "web",
 	"main": "index.html",
 	"title": "Engaged By",
-	"icon": "icon.png",
+	"icon": "images/EngagedByIcon.png",
 	"uiRevision": "2"
 }
