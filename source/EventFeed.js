@@ -1,14 +1,14 @@
 enyo.kind({
-	name: "EngagedBy.EventFeed",
-	kind: enyo.SlidingView,
-	layoutKind: enyo.VFlexLayout,
-	events: {
-		"onListTap": "",
-		"onRefreshTap": ""
-	},
-	components: [
-	  {kind: "Header", content: "Groups"},
-		{kind: "WebService", url: "http://engagedby.com/users/8.json", onSuccess: "queryResponse", onFailure: "queryFail"},
+  name: "EngagedBy.EventFeed",
+  kind: enyo.SlidingView,
+  layoutKind: enyo.VFlexLayout,
+  events: {
+    "onListTap": "",
+    "onRefreshTap": ""
+  },
+  components: [
+    {kind: "Header", name: "header", content: "Groups"},
+    {kind: "WebService", onSuccess: "queryResponse", onFailure: "queryFail"},
 
     {kind: enyo.Scroller, flex: 1, components: [
       {kind: enyo.DividerDrawer, caption: "My Groups",components: [
@@ -20,23 +20,26 @@ enyo.kind({
            ]}
       ]}
     ]},
-		{kind: enyo.Toolbar, pack: "justify", components: [
-			{flex: 1},
-			{icon: "images/Refresh.png", onclick: "doRefreshTap", align: "right"}
-		]}
-	],
+    {kind: enyo.Toolbar, pack: "justify", components: [
+      {flex: 1},
+      {icon: "images/Refresh.png", onclick: "doRefreshTap", align: "right"}
+    ]}
+  ],
 
-	create: function() {
-		this.data = [];
-		this.inherited(arguments);
+  create: function() {
+    this.data = [];
+    this.inherited(arguments);
+  },
 
-		this.$.header.setContent("User id: " + localStorage.getItem("user_id"));
-		this.$.webService.call();
-	},
+  loadTheProfile: function(url) {
+    console.log("3 user_id: " + url);
+    this.$.webService.setUrl(url);
+    this.$.webService.call();
+  },
 
-	getGroup: function(inSender, inIndex) {
-	  if(this.data.length == 0) return false;
-		var group = this.data[inIndex];
+  getGroup: function(inSender, inIndex) {
+    if(this.data.length === 0) { return false; }
+    var group = this.data[inIndex];
 
     if (group) {
       var groupId = group.entity.id;
@@ -48,46 +51,46 @@ enyo.kind({
       this.$.listItemSize.setContent(groupEventsCount);
       return true;
     }
-	},
+  },
 
-	queryResponse: function(inSender, inResponse) {
-	  console.log("queryResponse!");
+  queryResponse: function(inSender, inResponse) {
+    console.log("queryResponse!");
     console.log(JSON.stringify(inResponse.user.groups));
     console.log(JSON.stringify(inResponse.user.groups[0].entity));
     console.log(inResponse.user.groups[0].entity.name);
 
     this.data = inResponse.user.groups;
     this.$.myGroupsList.render();
-	},
+  },
 
-	queryFail: function(inSender, inResponse) {
+  queryFail: function(inSender, inResponse) {
+    console.log("queryFail!");
+  },
 
-	},
+  repeaterSetupRow: function(inSender, inIndex) {
+    var d = this.repeaterData;
+    var record = d && d.items && d.items[inIndex];
+    if (record) {
+      this.$.repeaterItem.setContent(record.number);
+      return true;
+    }
+  },
 
-	repeaterSetupRow: function(inSender, inIndex) {
-		var d = this.repeaterData;
-		var record = d && d.items && d.items[inIndex];
-		if (record) {
-			this.$.repeaterItem.setContent(record.number);
-			return true;
-		}
-	},
+  lastOpen: null,
 
-	lastOpen: null,
-
-	itemCaptionClick: function(inSender, inEvent) {
-		var r = inEvent.rowIndex;
-		// get row data
-		var d = this.data[r];
-		if (!(d && d.items)) {
-			this.fetchDataForRow(r, this.data[r]);
-		} else {
-			this.toggleDrawer(r);
-		}
-	},
-	// do asynchonous call for additional data
-	// note: normally would use a service call for this, just mocking the delay for now.
-	// note that private data like the rowIndex can be placed on the service request object.
+  itemCaptionClick: function(inSender, inEvent) {
+    var r = inEvent.rowIndex;
+    // get row data
+    var d = this.data[r];
+    if (!(d && d.items)) {
+      this.fetchDataForRow(r, this.data[r]);
+    } else {
+      this.toggleDrawer(r);
+    }
+  }
+  // do asynchonous call for additional data
+  // note: normally would use a service call for this, just mocking the delay for now.
+  // note that private data like the rowIndex can be placed on the service request object.
   // fetchDataForRow: function(inRowIndex, inRowData) {
   //  enyo.job("fetchDataForRow" + inRowIndex, enyo.bind(this, "gotDataForRow", inRowIndex, inRowData, this.makeSubData()), 100);
   // },
