@@ -43,7 +43,8 @@ enyo.kind({
 
     {kind: enyo.Toolbar, pack: "justify", components: [
       {flex: 1},
-      {icon: "images/Refresh.png", onclick: "doRefreshTap", align: "right"}
+      {icon: "images/Refresh.png", onclick: "doRefreshTap", align: "right"},
+      {kind: "Button", caption: "logout", onclick: "signOutOfLinkedIn"},
     ]}
   ],
 
@@ -173,6 +174,10 @@ enyo.kind({
     
     var url = group.entity.events_url;
     this.owner.loadEventItems(url);
+  },
+  
+  signOutOfLinkedIn: function(){
+    this.owner.signOutOfLinkedIn();
   }
 
 });

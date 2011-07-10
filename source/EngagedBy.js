@@ -37,7 +37,12 @@ enyo.kind({
   loadEventItems: function(url) {
     this.$.eventItemsPane.loadEventItemsPane(url);
   },
+  
   loadEventView: function(url, event) {
     this.$.feedWebViewPane.loadEventViewPane(url, event);
+  },
+  
+  signOutOfLinkedIn: function(){
+    this.$.feedWebViewPane.signOutOfLinkedIn();
   }
 });

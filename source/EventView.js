@@ -36,7 +36,12 @@ enyo.kind({
     this.$.currentItemWebView.setUrl(url);
     this.event = event;
   },
-
+  
+  signOutOfLinkedIn: function() {
+    this.$.currentItemWebView.setUrl("https://www.linkedin.com/secure/login?session_full_logout=&trk=hb_signout");
+    // this.owner.next();
+  },
+  
   hideWebViewSpinner: function() {
     this.$.feedViewSpinner.hide();
   },
