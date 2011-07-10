@@ -44,7 +44,8 @@ enyo.kind({
   
   signOutOfLinkedIn: function(){
     this.$.feedWebViewPane.signOutOfLinkedIn();
-  }
+  },
+  
   resizeWebView: function() {
     this.$.feedWebViewPane.$.currentItemWebView.resize();
   }  
