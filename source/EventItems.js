@@ -99,7 +99,12 @@ enyo.kind({
   queryResponse: function(inSender, inResponse) {
     console.log("queryResponse!");
     this.console("EventsItem.queryResponse has been called --------!");
-    this.data = inResponse.user.groups;
+    if(inResponse.user) {
+      this.data = inResponse.user.group_events[0][1]; // [["aug 2011",[list of events]]
+    } else {
+      this.data = inResponse.entity.group_events[0][1];
+    }
+    this.console(JSON.stringify(this.data));
     this.$.myItemList.render();
   },
   

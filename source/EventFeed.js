@@ -12,8 +12,8 @@ enyo.kind({
 
     {kind: enyo.Scroller, flex: 1, components: [
       {kind: enyo.DividerDrawer, caption: "My Groups",components: [
-        {kind: enyo.VirtualRepeater, name: "myGroupsList", onSetupRow: "getGroup", onclick: "selectItem", components: [
-             {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, components: [
+        {kind: enyo.VirtualRepeater, name: "myGroupsList", onSetupRow: "getGroup", components: [
+            {kind: enyo.Item, name: "item", layout: enyo.HFlexBox, tapHighlight: true, onclick: "selectItem", components: [
                {name: "itemTitle", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: ""},
                {name: "itemAmount", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
              ]}
@@ -73,19 +73,16 @@ enyo.kind({
     console.log("queryFail!");
   },
 
-  getEventsUrl: function() {
-    this.console("getEventsUrl!");
-     var request_url = "http://engagedby.com/users/" + localStorage.getItem('user_id') + ".json";
-     return request_url;
-  },
-
  selectItem: function(inSender, inEvent) {
-    this.console("EventsFeed.selectItem is called !");
-
-   // this.$.list.select(inEvent.rowIndex);  //this doesn't work for whatever reason..
-    var request_url = this.getEventsUrl();
-    this.console("after geturl ");
-    this.owner.loadEventItems(request_url);
+    this.console("EventsFeed.selectItem is called !" + inEvent.rowIndex);
+//    this.$.item.select(inEvent.rowIndex);  //this doesn't work for whatever reason..
+    var group = this.data[inEvent.rowIndex];
+//    this.console(JSON.stringify(this.data[inEvent.rowIndex]));
+    var url = group.entity.events_url;
+    this.console("eventsurl" + url);
+    
+//    this.console("after geturl ");
+    this.owner.loadEventItems(url);
   }
 
 });
