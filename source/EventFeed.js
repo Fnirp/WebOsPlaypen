@@ -20,7 +20,7 @@ enyo.kind({
               {kind: "VFlexBox", pack: "top", components: [
                 {name: "itemTitle", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"},
                 {name: "itemAmount", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
-              ]},
+              ]}
             ]}
           ]}
         ]}
@@ -32,8 +32,8 @@ enyo.kind({
               {name: "otherGroupItemIcon", kind: "Image", style: "width: 48px; height: 48px; border: 2px solid #ccc;", flex: 1},
               {kind: "VFlexBox", pack: "top", components: [
                 {name: "otherGroupItemTitle", style: "margin-left: 10px;", content: "1"},
-                {name: "placeHolder", style: "margin-left: 10px;", content: ""},
-              ]},
+                {name: "placeHolder", style: "margin-left: 10px;", content: ""}
+              ]}
             ]}
           ]}
         ]}

@@ -13,10 +13,10 @@ enyo.kind({
       service: "palm://com.palm.applicationManager/",
       method: "open"
     },
-    {kind: "Header", components: [
+    {kind: "Header", name: "header", content: "Please select an event", components: [
       {kind: enyo.HFlexBox, flex: 1, components: [
-        {content: "", name: "selectedItemName", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", flex: 1},
-        {kind: enyo.Spinner, name: "itemWebViewSpinner", align: "right"}
+          {kind: "Spacer"},
+          {kind: enyo.Spinner, name: "itemWebViewSpinner", align: "right"}
       ]}
     ]},
     {kind: enyo.Scroller, flex: 1, components: [
@@ -33,17 +33,19 @@ enyo.kind({
   ],
 
   loadEventViewPane: function(url, event) {
+    this.$.header.setContent(event.name);
     this.$.currentItemWebView.setUrl(url);
     this.event = event;
   },
 
   hideWebViewSpinner: function() {
-    this.$.feedViewSpinner.hide();
+    this.$.itemWebViewSpinner.hide();
   },
   showWebViewSpinner: function() {
-    this.$.feedViewSpinner.show();
+    this.$.itemWebViewSpinner.show();
   },
   refreshWebView: function() {
+    this.$.currentItemWebView.resize();
     this.$.currentItemWebView.reloadPage();
   },
   addToCalendar: function() {
