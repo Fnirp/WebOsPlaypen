@@ -12,7 +12,7 @@ enyo.kind({
         onPageTitleChanged: "pageTitleChanged"
     }
   ],
-
+    
   pageTitleChanged: function() {
     var url = this.$.webView.url;
 
@@ -28,17 +28,8 @@ enyo.kind({
 
       var request_url = "http://engagedby.com/users/" + localStorage.getItem('user_id') + ".json";
       console.log("1 user_id: " + request_url);
-      this.owner.loadProfile(request_url);
+      this.owner.loadGroups(request_url);
       // this.$.webView.setUrl("https://www.linkedin.com/secure/login?session_full_logout=&trk=hb_signout");
     }
   }
-
-  /*
-    //
-    tar -cvf //the apps
-    copy into:
-    /media/internal/myfiles.tar
-    enable drive
-  }*/
-
 });

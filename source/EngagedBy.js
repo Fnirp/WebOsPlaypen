@@ -1,6 +1,3 @@
-/**
- * @author Jenny Ekelund
- */
 enyo.kind({
 	name: "EngagedBy",
 	kind: "Pane",
@@ -26,8 +23,14 @@ enyo.kind({
     }
   ],
 
-  loadProfile: function(url) {
+  loadGroups: function(url) {
     console.log("2 user_id: " + url);
-    this.$.eventFeedPane.loadTheProfile(url);
-  }
+    this.$.eventFeedPane.loadGroupsPane(url);
+  },
+  loadEventItems: function(url) {
+    this.$.eventItemsPane.loadEventItemsPane(url);
+  },    
+  loadEventView: function(url) {
+    this.$.eventItemsPane.loadEventViewPane(url);
+  }    
 });
