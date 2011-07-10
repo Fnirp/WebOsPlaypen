@@ -29,8 +29,8 @@ enyo.kind({
   },
   loadEventItems: function(url) {
     this.$.eventItemsPane.loadEventItemsPane(url);
-  },    
+  },
   loadEventView: function(url) {
-    this.$.eventItemsPane.loadEventViewPane(url);
-  }    
+    this.$.feedWebViewPane.loadEventViewPane(url);
+  }
 });

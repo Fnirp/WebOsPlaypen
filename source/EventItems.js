@@ -17,8 +17,8 @@ enyo.kind({
 
     {kind: enyo.Scroller, flex: 1, components: [
       {kind: enyo.DividerDrawer, caption: "Time",components: [
-        {kind: enyo.VirtualRepeater, name: "myItemList", onSetupRow: "getEvents", onclick: "selectItem", components: [
-            {kind: enyo.Item, name: "item", layout: enyo.HFlexBox, tapHighlight: true, components: [
+        {kind: enyo.VirtualRepeater, name: "myItemList", onSetupRow: "getEvents", components: [
+            {kind: enyo.Item, name: "item", layout: enyo.HFlexBox, tapHighlight: true, onclick: "selectItem", components: [
                  {kind: "HFlexBox", components: [
                    {name: "itemName", flex: 1, style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "", flex: 1},
                    {name: "itemDate", style: "text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
@@ -117,9 +117,9 @@ enyo.kind({
   },
 
   selectItem: function(inSender, inEvent) {
-   // this.$.list.select(inEvent.rowIndex); //this doesn't work for whatever reason ....
-    var request_url = getItemUrl();
-    this.owner.loadEventView(request_url);
+    var item = this.data[inEvent.rowIndex];
+    var url = item.event.webpage_url;
+    this.owner.loadEventView(url);
   }
 
 });

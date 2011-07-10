@@ -31,6 +31,11 @@ enyo.kind({
       {icon: "images/Refresh.png", onclick: "refreshWebView", align: "right"}
     ]}
   ],
+
+  loadEventViewPane: function(url) {
+    this.$.currentItemWebView.setUrl(url);
+  },
+
   hideWebViewSpinner: function() {
     this.$.feedViewSpinner.hide();
   },
