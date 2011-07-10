@@ -15,7 +15,7 @@ enyo.kind({
         {kind: enyo.VirtualRepeater, name: "myGroupsList", onSetupRow: "getGroup", onclick: "selectItem", components: [
              {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, components: [
                {kind: "HFlexBox", pack: "top", components: [
-                 {name: "itemIcon", kind: "Image", style: "width: 48px; height: 48px", flex: 1},
+                 {name: "itemIcon", kind: "Image", style: "width: 48px; height: 48px; border: 2px solid #ccc;", flex: 1},
                  {kind: "VFlexBox", pack: "top", components: [
                    {name: "itemTitle", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"},
                    {name: "itemAmount", style: "margin-left: 10px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;", content: "1"}
