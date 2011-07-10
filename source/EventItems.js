@@ -51,8 +51,6 @@ enyo.kind({
   },
 
   loadEventItemsPane: function(url) {
-    this.console("loadEventItemsPane is called");
-    this.console("Url is: " + url);
     this.$.webService.setUrl(url);
     this.$.webService.call();
   },
@@ -62,18 +60,11 @@ enyo.kind({
     var item = this.data[inIndex];
 
     if (item) {
-      this.console("Our json string: " + enyo.json.stringify(item));
-      console.log("Our json string: " + enyo.json.stringify(item));
-      console.log("Our json string: " + enyo.json.stringify(item.event));
       var eventName = item.event.name;
-      console.log("Our json string: " + enyo.json.stringify(eventName));
       var groupId = item.event.entity.id;
       var groupImage = item.event.entity.profile_image_url;
 
-      // check if the row is selected
-      var isRowSelected = (inIndex == this.selectedRow);
-//      this.selectedRow = - 1; //reset it so that if we change the group it's not defaulting
-
+      var isRowSelected = (inIndex === this.selectedRow); // check if the row is selected
 
       // color the row if it is
       this.$.item.applyStyle("background", isRowSelected ? "lightblue" : null);
@@ -92,14 +83,11 @@ enyo.kind({
   },
 
   queryResponse: function(inSender, inResponse) {
-    console.log("queryResponse!");
-    this.console("EventsItem.queryResponse has been called --------!");
     if(inResponse.user) {
       this.data = inResponse.user.group_events[0][1]; // [["aug 2011",[list of events]]
     } else {
       this.data = inResponse.entity.group_events[0][1];
     }
-    this.console(JSON.stringify(this.data));
     this.$.myItemList.render();
   },
 
@@ -114,9 +102,11 @@ enyo.kind({
 
   selectItem: function(inSender, inEvent) {
     this.selectedRow = inEvent.rowIndex;
+
     var item = this.data[inEvent.rowIndex];
     var url = item.event.webpage_url;
     this.owner.loadEventView(url);
+    this.$.myItemList.render();
   }
 
 });
