@@ -9,7 +9,7 @@ enyo.kind({
   components: [
     {kind: "Header", name: "header", content: "Groups"},
     {kind: "WebService", name: "myGroupsService", onSuccess: "queryResponse", onFailure: "queryFail"},
-    // {kind: "WebService", name: "otherGroupsService", onSuccess: "otherGroupsResponse", onFailure: "otherGroupsFail"},
+    {kind: "WebService", name: "otherGroupsService", onSuccess: "otherGroupsResponse", onFailure: "otherGroupsFail"},
 
     {kind: enyo.Scroller, flex: 1, components: [
       {kind: enyo.DividerDrawer, caption: "My Groups",components: [
@@ -25,7 +25,19 @@ enyo.kind({
           ]}
         ]}
       ]},
-      {kind: enyo.DividerDrawer, caption: "Other Groups",components: []}
+      {kind: enyo.DividerDrawer, caption: "Popular Groups",components: [
+        {kind: enyo.VirtualRepeater, name: "otherGroupsList", onSetupRow: "getOtherGroup", onclick: "selectOtherGroupItem", components: [
+          {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, components: [
+            {kind: "HFlexBox", pack: "top", components: [
+              {name: "otherGroupItemIcon", kind: "Image", style: "width: 48px; height: 48px; border: 2px solid #ccc;", flex: 1},
+              {kind: "VFlexBox", pack: "top", components: [
+                {name: "otherGroupItemTitle", style: "margin-left: 10px;", content: "1"},
+                {name: "placeHolder", style: "margin-left: 10px;", content: ""},
+              ]},
+            ]}
+          ]}
+        ]}
+      ]}
     ]},
     {name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
 
@@ -49,6 +61,12 @@ enyo.kind({
     this.$.myGroupsService.setUrl(url);
     this.$.myGroupsService.call();
   },
+  
+  loadOtherGroupsPane: function(url) {
+    console.log("loadOtherGroups: " + url);
+    this.$.otherGroupsService.setUrl(url);
+    this.$.otherGroupsService.call();
+  },
 
   getGroup: function(inSender, inIndex) {
     if(!this.data['myGroups']) { return false; }
@@ -60,18 +78,41 @@ enyo.kind({
       var groupEventsCount = group.entity.events_count;
       var groupEventsImage = group.entity.profile_image_url;
 
-      if(groupEventsImage != ""){
+      if(groupEventsImage !== ""){
         this.$.itemIcon.show();
         this.$.itemIcon.setSrc(groupEventsImage);
       }else{
         this.$.itemIcon.hide();
       }
-        
+
       this.$.itemTitle.setContent(groupName);
       this.$.itemAmount.setContent(groupEventsCount + " event(s)");
       return true;
     }
   },
+  
+  getOtherGroup: function(inSender, inIndex){
+    if(!this.data['otherGroups']) { return false; }
+    var otherGroup = this.data['otherGroups'][inIndex];
+
+    if (otherGroup) {
+      var groupId = otherGroup.entity.id;
+      var groupName = otherGroup.entity.name;
+      var groupEventsCount = otherGroup.entity.events_count;
+      var groupEventsImage = otherGroup.entity.profile_image_url;
+
+      if(groupEventsImage !== ""){
+        this.$.otherGroupItemIcon.setSrc(groupEventsImage);
+      }else{
+        this.$.otherGroupItemIcon.setSrc("../../images/EngagedByIcon.png");
+      }
+
+      this.$.otherGroupItemTitle.setContent(groupName);
+      return true;
+    }
+  },
+
+  
 
   queryResponse: function(inSender, inResponse) {
     console.log("queryResponse!");
@@ -83,33 +124,36 @@ enyo.kind({
     this.$.myGroupsList.render();
   },
   
-  // otherGroupsResponse: function(inSender, inResponse) {
-  //   console.log("otherGroupsResponse!");
-  //   console.log(JSON.stringify(inResponse.groups));
-  //   console.log(JSON.stringify(inResponse.groups[0].entity));
-  //   console.log(inResponse.groups[0].entity.name);
-  // 
-  //   this.data = inResponse.groups;
-  //   this.$.myGroupsList.render();
-  // },
+  otherGroupsResponse: function(inSender, inResponse) {
+    console.log("otherGroupsResponse!");
+    console.log(JSON.stringify(inResponse.user.other_groups));
+    console.log(JSON.stringify(inResponse.user.other_groups[0].entity));
+    console.log(inResponse.user.other_groups[0].entity.name);
+  
+    this.data['otherGroups'] = inResponse.user.other_groups.slice(0, 20);
+    this.$.otherGroupsList.render();
+  },
 
   queryFail: function(inSender, inResponse) {
     console.log("queryFail!");
   },
 
-  getEventsUrl: function() {
-    this.console("getEventsUrl!");
-     var request_url = "http://engagedby.com/users/" + localStorage.getItem('user_id') + ".json";
-     return request_url;
+  selectItem: function(inSender, inEvent) {
+    this.console("EventsFeed.selectItem is called !" + inEvent.rowIndex);
+    var group = this.data["myGroups"][inEvent.rowIndex];
+    var url = group.entity.events_url;
+    this.console("eventsurl" + url);
+
+    this.owner.loadEventItems(url);
   },
+  
+  selectOtherGroupItem: function(inSender, inEvent) {
+    this.console("EventsFeed.selectOtherGroupItem is called !" + inEvent.rowIndex);
+    var group = this.data['otherGroups'][inEvent.rowIndex];
+    var url = group.entity.events_url;
+    this.console("********OtherGroupItem eventsurl" + url);
 
- selectItem: function(inSender, inEvent) {
-    this.console("EventsFeed.selectItem is called !");
-
-   // this.$.list.select(inEvent.rowIndex);  //this doesn't work for whatever reason..
-    var request_url = this.getEventsUrl();
-    this.console("after geturl ");
-    this.owner.loadEventItems(request_url);
+    this.owner.loadEventItems(url);
   }
 
 });
