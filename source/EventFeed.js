@@ -13,7 +13,10 @@ enyo.kind({
     {kind: enyo.Scroller, flex: 1, components: [
       {kind: enyo.DividerDrawer, caption: "My Groups",components: [
         {kind: enyo.VirtualRepeater, name: "myGroupsList", onSetupRow: "getGroup", components: [
-             {kind: enyo.Item, layout: enyo.HFlexBox, tapHighlight: true, onclick: "selectItem", components: [
+// from feedreader           {kind: "Item", className: "item", onclick: "selectItem", Xonmousedown: "selectItem", components: [
+ //  previously         {kind: enyo.Item, className: "item", layout: enyo.HFlexBox, tapHighlight: true, onclick: "selectItem", components: [
+
+            {kind: enyo.Item, name: "item", tapHighlight: true, onclick: "selectItem", Xonmousedown: "selectItem", components: [
                {kind: "HFlexBox", pack: "top", components: [
                  {name: "itemIcon", kind: "Image", style: "width: 48px; height: 48px; border: 2px solid #ccc;", flex: 1},
                  {kind: "VFlexBox", pack: "top", components: [
@@ -39,6 +42,7 @@ enyo.kind({
 
   create: function() {
     this.data = [];
+    this.selectedRow = -1;
     this.inherited(arguments);
   },
 
@@ -53,12 +57,21 @@ enyo.kind({
     var group = this.data[inIndex];
 
     if (group) {
+      
+
       var groupId = group.entity.id;
       var groupName = group.entity.name;
       var groupEventsCount = group.entity.events_count;
       var groupEventsImage = group.entity.profile_image_url;
 
-      if(groupEventsImage !== ""){
+      // check if the row is selected
+      var isRowSelected = (inIndex == this.selectedRow);
+  //    this.selectedRow = - 1; //reset it so that if we change the group it's not defaulting
+
+      // color the row if it is
+      this.$.item.applyStyle("background", isRowSelected ? "lightblue" : null);
+ 
+      if(groupEventsImage != ""){
         this.$.itemIcon.show();
         this.$.itemIcon.setSrc(groupEventsImage);
       }else{
@@ -86,10 +99,12 @@ enyo.kind({
   },
 
  selectItem: function(inSender, inEvent) {
-    this.console("EventsFeed.selectItem is called !" + inEvent.rowIndex);
+    this.selectedRow = inEvent.rowIndex;
+    
     var group = this.data[inEvent.rowIndex];
     var url = group.entity.events_url;
-    this.console("eventsurl" + url);
+    
+    this.$.myGroupsList.render();
 
     this.owner.loadEventItems(url);
   }

@@ -32,19 +32,6 @@ enyo.kind({
 
     {name: "console", content: "select an item", style: "color: white; background-color: gray; border: 1px solid black; padding: 4px;"},
 
-/*
-    {flex: 1, name: "list", kind: "VirtualList", className: "list", onSetupRow: "listSetupRow", components: [
-      {kind: "Divider"},
-        {kind: "Item", className: "item", onclick: "selectItem", Xonmousedown: "selectItem", components: [
-          {kind: "HFlexBox", components: [
-            {name: "itemColor", className: "item-color"},
-            {name: "itemName", flex: 1},
-            {name: "itemIndex", className: "item-index"}
-        ]},
-        {name: "itemOrganisation", className: "item-organisation"},
-        {name: "itemDescription", className: "item-description"}
-      ]}
-    ]},*/
     {kind: enyo.Toolbar, pack: "justify", components: [
       {kind: enyo.GrabButton},
       {flex: 1},
@@ -59,6 +46,7 @@ enyo.kind({
 
   create: function() {
     this.data = [];
+    this.selectedRow = -1;
     this.inherited(arguments);
   },
 
@@ -82,7 +70,15 @@ enyo.kind({
       var groupId = item.event.entity.id;
       var groupImage = item.event.entity.profile_image_url;
 
-      //this.$.item.applyStyle("background-color", inSender.isSelected(inIndex) ? "lightblue" : null);
+      // check if the row is selected
+      var isRowSelected = (inIndex == this.selectedRow);
+//      this.selectedRow = - 1; //reset it so that if we change the group it's not defaulting
+
+
+      // color the row if it is
+      this.$.item.applyStyle("background", isRowSelected ? "lightblue" : null);
+      //populate the rows
+
       this.$.itemName.setContent(eventName);
       this.$.itemDate.setContent("");
       this.$.itemOrganisation.applyStyle("font-size", "smaller");
@@ -117,6 +113,7 @@ enyo.kind({
   },
 
   selectItem: function(inSender, inEvent) {
+    this.selectedRow = inEvent.rowIndex;
     var item = this.data[inEvent.rowIndex];
     var url = item.event.webpage_url;
     this.owner.loadEventView(url);

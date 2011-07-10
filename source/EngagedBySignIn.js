@@ -3,14 +3,24 @@ enyo.kind({
 	kind: enyo.VFlexBox,
 	className: "enyo-bg",
 	components: [
-	  {
-        kind: "BasicWebView",
-        name: "webView",
-        width: "600px",
-        style: "margin:auto",
-        url: "http://engagedby.com/webos",
-        onPageTitleChanged: "pageTitleChanged"
-    }
+	  
+			{kind: "HFlexBox", tapHighlight: false, components: [
+				{
+				  content: "",
+				  name: "spinnerLabel"
+				},
+				{kind: "Spacer"},
+				{kind: "enyo.Spinner", name: "feedWebViewSpinner"}
+			]},
+
+        {
+            kind: "BasicWebView",
+            name: "webView", 
+            url: "http://engagedby.com/webos",
+            onPageTitleChanged: "pageTitleChanged",
+            onLoadComplete: "hideWebViewSpinner", 
+            onLoadStarted: "showWebViewSpinner"
+        }
   ],
     
   pageTitleChanged: function() {
@@ -31,5 +41,15 @@ enyo.kind({
       this.owner.loadGroups(request_url);
       // this.$.webView.setUrl("https://www.linkedin.com/secure/login?session_full_logout=&trk=hb_signout");
     }
-  }
+  },
+  
+  hideWebViewSpinner: function() {
+		this.$.feedWebViewSpinner.hide();
+		this.$.spinnerLabel.setContent("");
+	},
+	showWebViewSpinner: function() {
+		this.$.feedWebViewSpinner.show();
+		this.$.spinnerLabel.setContent("Loading...");
+	}
+
 });
